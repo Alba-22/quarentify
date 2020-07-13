@@ -27,7 +27,7 @@ Dio _dio = new Dio(dioOptions);
 Future getTopRead(String type, String accessToken) async {
   try {
     final response = await _dio.get(
-      "https://api.spotify.com/v1/me/top/$type",
+      "/me/top/$type",
       options: Options(
         headers: {
           "Authorization": "Bearer $accessToken"
@@ -162,4 +162,42 @@ testPrint(List artist) {
   artist.forEach((element) {
     print("Genre: ${element["genres"]}");
   });
+}
+
+getRecommendations(tracksPo, artistsPo, String authToken) async {
+  var tracksIds = tracksPo["items"].sublist(0, 2).map((item) => item["id"]);
+  var artistsIds = artistsPo["items"].sublist(0, 2).map((item) => item["id"]);
+
+  String tracksIdsString = tracksIds.join(",");
+  String artistsIdsString = artistsIds.join(",");
+  var recommendations = await _dio.get(
+    "/recommendations?limit=50&seed_artists=$artistsIdsString&seed_tracks=$tracksIdsString",
+    options: Options(
+      headers: {"Authorization": "Bearer $authToken"}
+    )
+  );
+
+  if (recommendations.statusCode != 200) {
+    // Resets to origin window if API does not return ok
+    window.alert(recommendations.data);
+    window.location.href = window.location.origin;
+  }
+
+  return recommendations.data;
+}
+
+getUserId(String authToken) async {
+  var response = await _dio.get(
+    "/me", 
+    options: Options(
+      headers: {"Authorization": "Bearer $authToken"}
+    )
+  );
+
+  if (response.statusCode != 200) {
+    window.alert(response.data);
+    window.location.href = window.location.origin;
+  }
+
+  return response.data["id"];
 }
