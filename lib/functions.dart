@@ -25,13 +25,13 @@ BaseOptions dioOptions = new BaseOptions(
 
 Dio _dio = new Dio(dioOptions);
 
-Future getTopRead(String type, String accessToken) async {
+Future getTopRead(String type, String authToken) async {
   try {
     final response = await _dio.get(
       "/me/top/$type",
       options: Options(
         headers: {
-          "Authorization": "Bearer $accessToken"
+          "Authorization": "Bearer $authToken"
         }  
       ),
     );
@@ -165,13 +165,25 @@ testPrint(List artist) {
   });
 }
 
-getRecommendations(tracksPo, artistsPo, String authToken) async {
-  var tracksIds = tracksPo.items.sublist(0, 2).map((item) => item.id);
-  var artistsIds = artistsPo.items.sublist(0, 2).map((item) => item.id);
-  String tracksIdsString = tracksIds.join(",");
-  String artistsIdsString = artistsIds.join(",");
+getRecommendations(String authToken, [tracksPo, artistsPo]) async {
+  if (tracksPo == null && artistsPo == null)
+    return null;
+  
+  var tracksIds;// = tracksPo.items.sublist(0, 2).map((item) => item.id).toList();
+  var artistsIds;// = artistsPo.items.sublist(0, 2).map((item) => item.id);
+  String requestString = "/recommendations?limit=50";
+  if (tracksPo != null) {
+    tracksIds = tracksPo.items.sublist(0, 2).map((item) => item.id);
+    requestString = requestString + "&seed_tracks=" + tracksIds.join(",");
+  }
+  if (artistsPo != null) {
+    artistsIds = artistsPo.items.sublist(0, 2).map((item) => item.id);
+    requestString = requestString + "&seed_artists=" + artistsIds.join(",");
+  }
+  //String tracksIdsString = tracksIds.join(",");
+  //String artistsIdsString = artistsIds.join(",");
   var recommendations = await _dio.get(
-    "/recommendations?limit=50&seed_artists=$artistsIdsString&seed_tracks=$tracksIdsString",
+    requestString,
     options: Options(
       headers: {"Authorization": "Bearer $authToken"}
     )
