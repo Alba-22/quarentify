@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:html';
 import 'package:dio/dio.dart';
 import 'package:quarentify/models/artists.list.model.dart';
@@ -165,9 +166,8 @@ testPrint(List artist) {
 }
 
 getRecommendations(tracksPo, artistsPo, String authToken) async {
-  var tracksIds = tracksPo["items"].sublist(0, 2).map((item) => item["id"]);
-  var artistsIds = artistsPo["items"].sublist(0, 2).map((item) => item["id"]);
-
+  var tracksIds = tracksPo.items.sublist(0, 2).map((item) => item.id);
+  var artistsIds = artistsPo.items.sublist(0, 2).map((item) => item.id);
   String tracksIdsString = tracksIds.join(",");
   String artistsIdsString = artistsIds.join(",");
   var recommendations = await _dio.get(
@@ -200,4 +200,41 @@ getUserId(String authToken) async {
   }
 
   return response.data["id"];
+}
+
+createPlaylist(String authToken, String userId) async {
+  var response = await _dio.post(
+    "/users/$userId/playlists",
+    data: { "name": "Quarentify Playlist", "public" : "false" },
+    options: Options(
+      headers: {"Authorization": "Bearer $authToken", "Content-Type": "application/json"},
+    )
+  );
+
+  // Code may be 200 or 201 according to Spotify Docs
+  if (response.statusCode != 200 && response.statusCode != 201) {
+    window.alert(response.data);
+    window.location.href = window.location.origin;
+  }
+
+  return response.data["id"];
+}
+
+createRecommendedPlaylist(tracksPo, artistsPo, String userId, String authToken) async{
+  var recommendedTracksObj = await getRecommendations(tracksPo, artistsPo, authToken);
+  // Creates a list of all the recommended tracks URIs
+  var recommendedTracksUris = recommendedTracksObj["tracks"].map((track) => track["uri"]).toList();
+  
+  // Creates playlist and gets its ID
+  String playlistId = await createPlaylist(authToken, await getUserId(authToken));
+  
+  var response = await _dio.post(
+    "/playlists/$playlistId/tracks",
+    data: jsonEncode({ "uris": recommendedTracksUris }),
+    options: Options(
+      headers: {"Authorization": "Bearer $authToken"},
+    )
+  );
+
+  return response.data;
 }
