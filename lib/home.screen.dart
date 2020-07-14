@@ -33,10 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   manageTopRead() async {
     // ! CHANGE TEMPTOKEN TO WIDGET.ACCESSTOKEN
-    tracks = await getTopRead("tracks", tempToken);
-    artists = await getTopRead("artists", tempToken);
+    tracks = await getTopRead("tracks", widget.accessToken);
+    artists = await getTopRead("artists", widget.accessToken);
     List<dynamic> artistsGenres = await getTopGenresByArtists(artists);
-    List<dynamic> tracksGenres = await getTopGenresByMusic(tracks, tempToken);
+    List<dynamic> tracksGenres = await getTopGenresByMusic(tracks, widget.accessToken);
     genres.addAll(artistsGenres);
     genres.addAll(tracksGenres);
     setState(() {
