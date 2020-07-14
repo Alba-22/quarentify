@@ -1,5 +1,5 @@
 class TopArtistsModel {
-  List<Items> items;
+  List<ArtistsItems> items;
   int total;
   int limit;
   int offset;
@@ -18,9 +18,9 @@ class TopArtistsModel {
 
   TopArtistsModel.fromJson(Map<String, dynamic> json) {
     if (json['items'] != null) {
-      items = new List<Items>();
+      items = new List<ArtistsItems>();
       json['items'].forEach((v) {
-        items.add(new Items.fromJson(v));
+        items.add(new ArtistsItems.fromJson(v));
       });
     }
     total = json['total'];
@@ -46,7 +46,7 @@ class TopArtistsModel {
   }
 }
 
-class Items {
+class ArtistsItems {
   ExternalUrls externalUrls;
   Followers followers;
   List<String> genres;
@@ -58,7 +58,7 @@ class Items {
   String type;
   String uri;
 
-  Items(
+  ArtistsItems(
       {this.externalUrls,
       this.followers,
       this.genres,
@@ -70,7 +70,7 @@ class Items {
       this.type,
       this.uri});
 
-  Items.fromJson(Map<String, dynamic> json) {
+  ArtistsItems.fromJson(Map<String, dynamic> json) {
     externalUrls = json['external_urls'] != null
         ? new ExternalUrls.fromJson(json['external_urls'])
         : null;

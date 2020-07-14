@@ -6,9 +6,11 @@ import 'package:quarentify/home.screen.dart';
 import 'functions.dart';
 
 void main() {
-  print(window.location.href);
-  String accessToken = getAuthToken();
-  print(accessToken);
+  // print(window.location.href);
+  // String accessToken = getAuthToken();
+  // print(accessToken);
+  // ! UNCOMMENT ABOVE LINES AND COMMENT BELOW
+  String accessToken = "";
   runApp(MyApp(accessToken: accessToken));
 }
 
@@ -24,7 +26,11 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: Color(0xFF1DB954),
+        backgroundColor: Color(0xFF212121),
+        scaffoldBackgroundColor: Color(0xFF121212),
+        textSelectionColor: Colors.white,
+        fontFamily: "Gotham-Medium",
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: HomeScreen(accessToken: accessToken),
