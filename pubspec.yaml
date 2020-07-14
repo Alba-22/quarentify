@@ -24,6 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^3.0.9
+  auto_size_text: ^2.1.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -55,17 +56,19 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+  fonts:
+    - family: Gotham-Medium
+      fonts:
+        - asset: assets/fonts/Gotham-Medium.ttf
+    - family: Gotham-Thin
+      fonts:
+        - asset: assets/fonts/Gotham-Thin.ttf
+    - family: Gotham-Ultra
+      fonts:
+        - asset: assets/fonts/Gotham-Ultra.ttf
+    - family: Gotham-Light
+      fonts:
+        - asset: assets/fonts/Gotham-Light.ttf
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
