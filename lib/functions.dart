@@ -80,7 +80,7 @@ Future<ArtistsListModel> getArtistsList(String artistsIds,String accessToken) as
   }
 }
 
-Future getTopGenresByMusic(TopTracksModel tracksPo, String accessToken) async {
+Future getTopGenresByMusic(TopTracksModel tracksPo, String authToken) async {
   if (tracksPo != null) {
     final artistsIdsMap = tracksPo.items.map((element) {
       return element.artists[0];
@@ -91,7 +91,7 @@ Future getTopGenresByMusic(TopTracksModel tracksPo, String accessToken) async {
 
     String artistsIdsString = artistsIdsMap.join(",");
 
-    final ArtistsListModel artistsList = await getArtistsList(artistsIdsString, accessToken);
+    final ArtistsListModel artistsList = await getArtistsList(artistsIdsString, authToken);
 
     if (artistsList != null) {
       List topGenre = [{ "times": 0, "name": "" }];
@@ -157,6 +157,22 @@ Future getTopGenresByArtists(TopArtistsModel artistsPo) async {
   window.alert("Failed");
   window.location.href = window.location.origin;
   return null;
+}
+
+// This function gets all top genres and makes sure they do not repeat
+getAllTopGenres(topGenresByMusic, topGenresByArtists) {
+  var byMusicGenres = {};
+  // Saves all genres previously present in the first list
+  topGenresByMusic.forEach((genre) => byMusicGenres[genre["name"]] = true);
+
+  for (int i = 0; i < topGenresByArtists.length; i++) {
+    // if the genre found in the topGenresByArtists array is found at byMusicsGenres
+    if (byMusicGenres[topGenresByArtists[i]["name"]] == true) {
+      topGenresByArtists.removeAt(i);
+    }
+  }
+
+  return(topGenresByArtists + topGenresByMusic);
 }
 
 Future getRecommendations(String authToken, [TopTracksModel tracksPo, TopArtistsModel artistsPo]) async {
