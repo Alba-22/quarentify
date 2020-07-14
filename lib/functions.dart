@@ -83,7 +83,7 @@ Future<ArtistsListModel> getArtistsList(String artistsIds,String accessToken) as
 Future getTopGenresByMusic(TopTracksModel tracksPo, String authToken) async {
   if (tracksPo != null) {
     final artistsIdsMap = tracksPo.items.map((element) {
-      return element.artists[0];
+      if (element.isLocal == false) return element.artists[0];
     })
     .map((element) {
       return element.id;

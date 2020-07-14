@@ -1,16 +1,6 @@
-# quarentify
+# Quarentify
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Use a neat interface to check your Spotify stats while you stayed at home.
+This project was created and deployed while the COVID-19 pandemic was still at large at Brazil.
+It uses the Spotify API and the Flutter web framework to display stats such as the tracks and artists you listened to the most.
+It also uses the just mentioned data to learn a little about the user's preferred genres and to create them a recommended playlist.
