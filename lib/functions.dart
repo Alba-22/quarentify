@@ -159,18 +159,13 @@ Future getTopGenresByArtists(TopArtistsModel artistsPo) async {
   return null;
 }
 
-testPrint(List artist) {
-  artist.forEach((element) {
-    print("Genre: ${element["genres"]}");
-  });
-}
-
-getRecommendations(String authToken, [tracksPo, artistsPo]) async {
+Future getRecommendations(String authToken, [TopTracksModel tracksPo, TopArtistsModel artistsPo]) async {
   if (tracksPo == null && artistsPo == null)
     return null;
   
-  var tracksIds;// = tracksPo.items.sublist(0, 2).map((item) => item.id).toList();
-  var artistsIds;// = artistsPo.items.sublist(0, 2).map((item) => item.id);
+  var tracksIds;
+  var artistsIds;
+
   String requestString = "/recommendations?limit=50";
   if (tracksPo != null) {
     tracksIds = tracksPo.items.sublist(0, 2).map((item) => item.id);
@@ -180,8 +175,7 @@ getRecommendations(String authToken, [tracksPo, artistsPo]) async {
     artistsIds = artistsPo.items.sublist(0, 2).map((item) => item.id);
     requestString = requestString + "&seed_artists=" + artistsIds.join(",");
   }
-  //String tracksIdsString = tracksIds.join(",");
-  //String artistsIdsString = artistsIds.join(",");
+
   var recommendations = await _dio.get(
     requestString,
     options: Options(
@@ -198,7 +192,7 @@ getRecommendations(String authToken, [tracksPo, artistsPo]) async {
   return recommendations.data;
 }
 
-getUserId(String authToken) async {
+Future<String> getUserId(String authToken) async {
   var response = await _dio.get(
     "/me", 
     options: Options(
@@ -214,7 +208,7 @@ getUserId(String authToken) async {
   return response.data["id"];
 }
 
-createPlaylist(String authToken, String userId) async {
+Future<String> createPlaylist(String authToken, String userId) async {
   var response = await _dio.post(
     "/users/$userId/playlists",
     data: { "name": "Quarentify Playlist", "public" : "false" },
@@ -232,8 +226,9 @@ createPlaylist(String authToken, String userId) async {
   return response.data["id"];
 }
 
-createRecommendedPlaylist(tracksPo, artistsPo, String userId, String authToken) async{
-  var recommendedTracksObj = await getRecommendations(tracksPo, artistsPo, authToken);
+Future createRecommendedPlaylist(String userId, String authToken, [TopTracksModel tracksPo, TopArtistsModel artistsPo]) async{
+  if (tracksPo == null && artistsPo == null) return null;
+  var recommendedTracksObj = await getRecommendations(authToken, tracksPo, artistsPo);
   // Creates a list of all the recommended tracks URIs
   var recommendedTracksUris = recommendedTracksObj["tracks"].map((track) => track["uri"]).toList();
   
