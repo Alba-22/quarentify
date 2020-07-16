@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // ! CHANGE TEMPTOKEN TO WIDGET.ACCESSTOKEN
     tracks = await getTopRead("tracks", widget.accessToken);
     artists = await getTopRead("artists", widget.accessToken);
-    tracksGenres = await getTopGenresByMusic(tracks, widget.accessToken);
+    tracksGenres = await getTopGenresByTracks(tracks, widget.accessToken);
     artistsGenres = await getTopGenresByArtists(artists);
     topGenres = getAllTopGenres(tracksGenres, artistsGenres);
     setState(() {

@@ -92,7 +92,7 @@ Future<ArtistsListModel> getArtistsList(String artistsIds,String accessToken) as
   }
 }
 
-Future<List<TopGenreModel>> getTopGenresByMusic(TopTracksModel tracksPo, String authToken) async {
+Future<List<TopGenreModel>> getTopGenresByTracks(TopTracksModel tracksPo, String authToken) async {
   if (tracksPo != null) {
     final artistsIdsMap = tracksPo.items.map((element) {
       if (element.isLocal == false) return element.artists[0];
@@ -185,19 +185,19 @@ Future<List<TopGenreModel>> getTopGenresByArtists(TopArtistsModel artistsPo) asy
 }
 
 // This function gets all top genres and makes sure they do not repeat
-List<TopGenreModel> getAllTopGenres(List<TopGenreModel> topGenresByMusic, List<TopGenreModel> topGenresByArtists) {
-  var byMusicGenres = {};
+List<TopGenreModel> getAllTopGenres(List<TopGenreModel> topGenresByTracks, List<TopGenreModel> topGenresByArtists) {
+  var byTracksGenres = {};
   // Saves all genres previously present in the first list
-  topGenresByMusic.forEach((genre) => byMusicGenres[genre.name] = true);
+  topGenresByTracks.forEach((genre) => byTracksGenres[genre.name] = true);
 
   for (int i = 0; i < topGenresByArtists.length; i++) {
-    // if the genre found in the topGenresByArtists array is found at byMusicsGenres
-    if (byMusicGenres[topGenresByArtists[i].name] == true) {
+    // if the genre found in the topGenresByArtists array is found at byTracksGenres
+    if (byTracksGenres[topGenresByArtists[i].name] == true) {
       topGenresByArtists.removeAt(i);
     }
   }
 
-  return(topGenresByArtists + topGenresByMusic);
+  return(topGenresByArtists + topGenresByTracks);
 }
 
 Future<RecommendationsModel> getRecommendations(String authToken, [TopTracksModel tracksPo, TopArtistsModel artistsPo]) async {
