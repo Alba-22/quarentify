@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:quarentify/components/top.genres.card.dart';
+import 'package:quarentify/models/top.genre.model.dart';
 
 class TopGenresWidget extends StatelessWidget {
 
-  final List<dynamic> genres;
+  final List<TopGenreModel> genres;
 
   const TopGenresWidget({Key key, @required this.genres}) : super(key: key);
 
@@ -33,6 +35,21 @@ class TopGenresWidget extends StatelessWidget {
             height: 0.5,
             color: Theme.of(context).textSelectionColor,
           ),
+          Container(
+            height: 150,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: genres.length,
+              itemBuilder: (context, index) {
+                return Container(
+                  margin: index == 0
+                  ? EdgeInsets.only(left: MediaQuery.of(context).size.width * 0.05)
+                  : EdgeInsets.all(0),
+                  child: TopGenresCard(name: genres[index].name)
+                );
+              },
+            ),
+          )
         ],
       ),
     );

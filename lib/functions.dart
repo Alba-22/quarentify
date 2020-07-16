@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'dart:html';
 import 'package:dio/dio.dart';
 import 'package:quarentify/models/artists.list.model.dart';
+import 'package:quarentify/models/recommendations.model.dart';
 import 'package:quarentify/models/top.artists.model.dart';
+import 'package:quarentify/models/top.genre.model.dart';
 import 'package:quarentify/models/top.tracks.model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 getAuthToken() {
   var tokenStart = window.location.href.indexOf("access_token=");
@@ -14,6 +17,15 @@ getAuthToken() {
   var tokenEnd = window.location.href.indexOf("&");
   return window.location.href.substring(tokenStart, tokenEnd);
 }
+
+void urlLauncher(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } 
+    else {
+      throw 'Could not launch $url';
+    }
+  }
 
 BaseOptions dioOptions = new BaseOptions(
   baseUrl: "https://api.spotify.com/v1",
@@ -80,7 +92,7 @@ Future<ArtistsListModel> getArtistsList(String artistsIds,String accessToken) as
   }
 }
 
-Future getTopGenresByMusic(TopTracksModel tracksPo, String authToken) async {
+Future<List<TopGenreModel>> getTopGenresByMusic(TopTracksModel tracksPo, String authToken) async {
   if (tracksPo != null) {
     final artistsIdsMap = tracksPo.items.map((element) {
       if (element.isLocal == false) return element.artists[0];
@@ -94,7 +106,8 @@ Future getTopGenresByMusic(TopTracksModel tracksPo, String authToken) async {
     final ArtistsListModel artistsList = await getArtistsList(artistsIdsString, authToken);
 
     if (artistsList != null) {
-      List topGenre = [{ "times": 0, "name": "" }];
+      List<TopGenreModel> topGenreList = new List<TopGenreModel>();
+      topGenreList.add(TopGenreModel(times: 0, name: ""));
       Map<String, dynamic> genresObj = {};
 
       artistsList.artists.forEach((artist) {
@@ -107,15 +120,21 @@ Future getTopGenresByMusic(TopTracksModel tracksPo, String authToken) async {
           }
 
           // Resets the array with the new top genre or adds another genre if it's just as liked
-          if (genresObj[genre] > topGenre[0]["times"]) {
-            topGenre = [ { "times": genresObj[genre], "name": genre } ];
+          if (genresObj[genre] > topGenreList[0].times) {
+            topGenreList = [TopGenreModel(
+              times: genresObj[genre], 
+              name: genre
+            )];
           }
-          else if (genresObj[genre] == topGenre[0]["times"] && !topGenre.any((element) => element["name"] == genre)) {
-            topGenre.add({ "times": genresObj[genre], "name": genre });
+          else if (genresObj[genre] == topGenreList[0].times && !topGenreList.any((element) => element.name == genre)) {
+            topGenreList.add(TopGenreModel(
+              times: genresObj[genre], 
+              name: genre
+            ));
           } 
         });
       });
-      return topGenre;
+      return topGenreList;
     }
     else {
       window.alert("Failed");
@@ -128,10 +147,10 @@ Future getTopGenresByMusic(TopTracksModel tracksPo, String authToken) async {
   return null;
 }
 
-Future getTopGenresByArtists(TopArtistsModel artistsPo) async {
+Future<List<TopGenreModel>> getTopGenresByArtists(TopArtistsModel artistsPo) async {
   if (artistsPo != null) {
-
-    List topGenre = [{ "times": 0, "name": "" }];
+    List<TopGenreModel> topGenreList = new List<TopGenreModel>();
+    topGenreList.add(TopGenreModel(times: 0, name: ""));
     Map<String, dynamic> genresObj = {};
 
     artistsPo.items.forEach((artist) {
@@ -144,15 +163,21 @@ Future getTopGenresByArtists(TopArtistsModel artistsPo) async {
         }
 
         // Resets the array with the new top genre or adds another genre if it's just as liked
-        if (genresObj[genre] > topGenre[0]["times"]) {
-          topGenre = [ { "times": genresObj[genre], "name": genre } ];
+        if (genresObj[genre] > topGenreList[0].times) {
+          topGenreList = [TopGenreModel(
+            times: genresObj[genre],
+            name: genre
+          )];
         }
-        else if (genresObj[genre] == topGenre[0]["times"] && !topGenre.any((element) => element["name"] == genre)) {
-          topGenre.add({ "times": genresObj[genre], "name": genre });
+        else if (genresObj[genre] == topGenreList[0].times && !topGenreList.any((element) => element.name == genre)) {
+          topGenreList.add(TopGenreModel(
+            times: genresObj[genre],
+            name: genre
+          ));
         } 
       });
     });
-    return topGenre;
+    return topGenreList;
   }
   window.alert("Failed");
   window.location.href = window.location.origin;
@@ -160,14 +185,14 @@ Future getTopGenresByArtists(TopArtistsModel artistsPo) async {
 }
 
 // This function gets all top genres and makes sure they do not repeat
-getAllTopGenres(topGenresByMusic, topGenresByArtists) {
+List<TopGenreModel> getAllTopGenres(List<TopGenreModel> topGenresByMusic, List<TopGenreModel> topGenresByArtists) {
   var byMusicGenres = {};
   // Saves all genres previously present in the first list
-  topGenresByMusic.forEach((genre) => byMusicGenres[genre["name"]] = true);
+  topGenresByMusic.forEach((genre) => byMusicGenres[genre.name] = true);
 
   for (int i = 0; i < topGenresByArtists.length; i++) {
     // if the genre found in the topGenresByArtists array is found at byMusicsGenres
-    if (byMusicGenres[topGenresByArtists[i]["name"]] == true) {
+    if (byMusicGenres[topGenresByArtists[i].name] == true) {
       topGenresByArtists.removeAt(i);
     }
   }
@@ -175,14 +200,15 @@ getAllTopGenres(topGenresByMusic, topGenresByArtists) {
   return(topGenresByArtists + topGenresByMusic);
 }
 
-Future getRecommendations(String authToken, [TopTracksModel tracksPo, TopArtistsModel artistsPo]) async {
-  if (tracksPo == null && artistsPo == null)
+Future<RecommendationsModel> getRecommendations(String authToken, [TopTracksModel tracksPo, TopArtistsModel artistsPo]) async {
+  if (tracksPo == null && artistsPo == null) {
     return null;
+  }
   
   var tracksIds;
   var artistsIds;
-
   String requestString = "/recommendations?limit=50";
+
   if (tracksPo != null) {
     tracksIds = tracksPo.items.sublist(0, 2).map((item) => item.id);
     requestString = requestString + "&seed_tracks=" + tracksIds.join(",");
@@ -192,45 +218,56 @@ Future getRecommendations(String authToken, [TopTracksModel tracksPo, TopArtists
     requestString = requestString + "&seed_artists=" + artistsIds.join(",");
   }
 
-  var recommendations = await _dio.get(
+  var response = await _dio.get(
     requestString,
     options: Options(
-      headers: {"Authorization": "Bearer $authToken"}
+      headers: {
+        "Authorization": "Bearer $authToken",
+      }
     )
   );
 
-  if (recommendations.statusCode != 200) {
-    // Resets to origin window if API does not return ok
-    window.alert(recommendations.data);
-    window.location.href = window.location.origin;
+  if (response.statusCode == 200) {
+    return RecommendationsModel.fromJson(response.data);
   }
+  // Resets to origin window if API does not return ok
+  window.alert(response.data);
+  window.location.href = window.location.origin;
+  return null;
 
-  return recommendations.data;
 }
 
 Future<String> getUserId(String authToken) async {
   var response = await _dio.get(
     "/me", 
     options: Options(
-      headers: {"Authorization": "Bearer $authToken"}
+      headers: {
+        "Authorization": "Bearer $authToken",
+      }
     )
   );
 
-  if (response.statusCode != 200) {
-    window.alert(response.data);
-    window.location.href = window.location.origin;
+  if (response.statusCode == 200) {
+    return response.data["id"];
   }
-
-  return response.data["id"];
+  window.location.href = window.location.origin;
+  window.alert(response.data);
+  return null;
 }
 
 Future<String> createPlaylist(String authToken, String userId) async {
   var response = await _dio.post(
     "/users/$userId/playlists",
-    data: { "name": "Quarentify Playlist", "public" : "false" },
     options: Options(
-      headers: {"Authorization": "Bearer $authToken", "Content-Type": "application/json"},
-    )
+      headers: {
+        "Authorization": "Bearer $authToken", 
+        "Content-Type": "application/json"
+      },
+    ),
+    data: {
+      "name": "Quarentify Playlist",
+      "public" : "false"
+    },
   );
 
   // Code may be 200 or 201 according to Spotify Docs
@@ -242,11 +279,13 @@ Future<String> createPlaylist(String authToken, String userId) async {
   return response.data["id"];
 }
 
-Future createRecommendedPlaylist(String userId, String authToken, [TopTracksModel tracksPo, TopArtistsModel artistsPo]) async{
-  if (tracksPo == null && artistsPo == null) return null;
+Future<String> createRecommendedPlaylist(String authToken, [TopTracksModel tracksPo, TopArtistsModel artistsPo]) async{
+  if (tracksPo == null && artistsPo == null) {
+    return null;
+  }
   var recommendedTracksObj = await getRecommendations(authToken, tracksPo, artistsPo);
   // Creates a list of all the recommended tracks URIs
-  var recommendedTracksUris = recommendedTracksObj["tracks"].map((track) => track["uri"]).toList();
+  var recommendedTracksUris = recommendedTracksObj.tracks.map((track) => track.uri).toList();
   
   // Creates playlist and gets its ID
   String playlistId = await createPlaylist(authToken, await getUserId(authToken));
@@ -258,6 +297,8 @@ Future createRecommendedPlaylist(String userId, String authToken, [TopTracksMode
       headers: {"Authorization": "Bearer $authToken"},
     )
   );
-
-  return response.data;
+  if (response.statusCode == 200 || response.statusCode == 201) {
+    return playlistId;
+  }
+  return null;
 }

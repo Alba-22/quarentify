@@ -21,8 +21,19 @@ class TopArtistsWidget extends StatelessWidget {
               horizontal: MediaQuery.of(context).size.width * 0.05
             ),
             alignment: Alignment.centerLeft,
-            child: Text(
-              "Top 5 Artistas",
+            child: Text.rich(
+              TextSpan(
+                text: "Top 10 Artistas",
+                children: [
+                  TextSpan(
+                    text: "  (clique para ver o perfil)",
+                    style: TextStyle(
+                      fontSize: 12,
+                      letterSpacing: 0.5
+                    )
+                  )
+                ]
+              ),
               style: TextStyle(
                 color: Theme.of(context).textSelectionColor,
                 fontSize: 20
@@ -32,7 +43,7 @@ class TopArtistsWidget extends StatelessWidget {
           Container(
             margin: EdgeInsets.symmetric(
               vertical: 5,
-              horizontal: MediaQuery.of(context).size.width * 0.1
+              horizontal: MediaQuery.of(context).size.width * 0.05
             ),
             height: 0.5,
             color: Theme.of(context).textSelectionColor,

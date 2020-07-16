@@ -19,8 +19,19 @@ class TopTracksWidget extends StatelessWidget {
               horizontal: MediaQuery.of(context).size.width * 0.05
             ),
             alignment: Alignment.centerLeft,
-            child: Text(
-              "Top 5 Músicas",
+            child: Text.rich(
+              TextSpan(
+                text: "Top 10 Músicas",
+                children: [
+                  TextSpan(
+                    text: "  (clique para ouvir a música)",
+                    style: TextStyle(
+                      fontSize: 12,
+                      letterSpacing: 0.5
+                    )
+                  )
+                ]
+              ),
               style: TextStyle(
                 color: Theme.of(context).textSelectionColor,
                 fontSize: 20

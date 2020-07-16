@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:quarentify/components/top.genres.widget.dart';
 import 'package:quarentify/components/top.tracks.widget.dart';
 import 'package:quarentify/functions.dart';
-
+import 'package:quarentify/models/top.genre.model.dart';
 import 'components/top.artists.widget.dart';
+import 'models/top.artists.model.dart';
+import 'models/top.tracks.model.dart';
 
 class HomeScreen extends StatefulWidget {
 
@@ -19,15 +21,16 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
-  bool firstButtonLoad = false;
-  bool secondButtonLoad = false;
+  bool playlistLoading = false;
   bool initialLoading = true;
 
-  String tempToken = "BQAqxmT7eNxGcoI-2OmYndlq-oCArffIfIftYKQOrcGK_IfJsLbFl3xHqAIt1DsVcDt43hTyoruqotGY7sUlbOjW_YCeuhYOZZUb6ZZ3L-d0ORyd_-zh7N938pJcq37NllIHwtciuBPmNqi-1pAhVMe3KNtMo-vOXWgDRBg";
+  String tempToken = "BQAkFBQQf-QyD-OnBDYag1W3JzN0mY8DdxWTgwjKg-XzM_u2cVY5tuEVorxd5A7DJBbLby9iQ9t-mnGuXlYm14Q2VQ2jsAsXeTPHUi252qPmowmsq6aYZQq5qlcq-c0CgIQxqArPOTEzUwhJWJtl88JF-ngLn1PxX0TNBC84tw955pLjiJ2b7T0fc03321YZzD-W";
 
-  var tracks;
-  var artists;
-  List<dynamic> genres = List();
+  TopTracksModel tracks;
+  TopArtistsModel artists;
+  List<TopGenreModel> artistsGenres = new List();
+  List<TopGenreModel> tracksGenres = new List();
+  List<TopGenreModel> topGenres = new List();
 
   ScrollController scrollController = new ScrollController();
 
@@ -35,10 +38,9 @@ class _HomeScreenState extends State<HomeScreen> {
     // ! CHANGE TEMPTOKEN TO WIDGET.ACCESSTOKEN
     tracks = await getTopRead("tracks", widget.accessToken);
     artists = await getTopRead("artists", widget.accessToken);
-    List<dynamic> artistsGenres = await getTopGenresByArtists(artists);
-    List<dynamic> tracksGenres = await getTopGenresByMusic(tracks, widget.accessToken);
-    genres.addAll(artistsGenres);
-    genres.addAll(tracksGenres);
+    tracksGenres = await getTopGenresByMusic(tracks, widget.accessToken);
+    artistsGenres = await getTopGenresByArtists(artists);
+    topGenres = getAllTopGenres(tracksGenres, artistsGenres);
     setState(() {
       initialLoading = false;
     });
@@ -67,11 +69,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text(
           "QUARENTIFY",
           style: TextStyle(
-            fontWeight: FontWeight.bold
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).primaryColor
           ),
         ),
         elevation: 0,
@@ -80,47 +83,50 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SingleChildScrollView(
         child: Container(
           width: MediaQuery.of(context).size.width,
-          margin: EdgeInsets.symmetric(
-            vertical: 20,
+          margin: EdgeInsets.only(
+            top: 20,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TopTracksWidget(
-                tracks: tracks.items.sublist(0, 20),
+                tracks: tracks.items.sublist(0, 10),
               ),
               TopArtistsWidget(
-                artists: artists.items.sublist(0, 20),
+                artists: artists.items.sublist(0, 10),
               ),
               TopGenresWidget(
-                genres: genres,
+                genres: topGenres,
               ),
-
-              // CustomButton(
-              //   isLoading: firstButtonLoad,
-              //   text: "Pesquisa por Músicas".toUpperCase(),
-              //   width: 300,
-              //   onTap: () async {
-              //     setState(() { firstButtonLoad = true; });
-              //     // var genres = await getTopGenresByMusic(tracks, widget.accessToken);
-              //     var genres = await getTopGenresByMusic(tracks, tempToken);
-              //     setState(() { firstButtonLoad = false; });
-              //     print(genres);
-              //   },
-              // ),
-              // SizedBox(height: 20),
-              // CustomButton(
-              //   isLoading: secondButtonLoad,
-              //   text: "Pesquisa por Artistas".toUpperCase(),
-              //   width: 300,
-              //   onTap: () async {
-              //     setState(() { secondButtonLoad = true; });
-              //     var genres = await getTopGenresByArtists(artists);
-              //     setState(() { secondButtonLoad = false; });
-              //     print(genres);
-              //   },
-              // ),
+              InkWell(
+                onTap: () async {
+                  setState(() { playlistLoading = true; });
+                  final playlistId = await createRecommendedPlaylist(widget.accessToken, tracks, artists);
+                  setState(() { playlistLoading = false; });
+                  urlLauncher("https://open.spotify.com/playlist/$playlistId");
+                },
+                child: Container(
+                  color: Theme.of(context).primaryColor,
+                  width: double.infinity,
+                  height: 50,
+                  child: playlistLoading == false
+                  ? Center(
+                    child: Text(
+                      "Criar Playlist Recomendada",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18
+                      ),
+                    ),
+                  )
+                  : Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation(Colors.white),
+                    ),
+                  ),
+                ),
+              )
             ],
           ),
         ),
