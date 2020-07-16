@@ -302,3 +302,22 @@ Future<String> createRecommendedPlaylist(String authToken, [TopTracksModel track
   }
   return null;
 }
+
+Future<String> createTailoredPlaylist(TopArtistsModel artistsPo, List<TopGenreModel> topGenres, String authToken) async {
+  List<ArtistsItems> recommendedArtistsItems = [];
+  List<String> topGenresList = topGenres.map((genre) => genre.name).toList();
+
+  artistsPo.items.forEach((item) {
+    // if any of the genres found in the curren artists (item) exists in the topGenresList
+    if (item.genres.any((genre) => topGenresList.contains(genre))) {
+      recommendedArtistsItems.add(item);
+    }
+  });
+
+  if (recommendedArtistsItems.length == 0) return null;
+
+  TopArtistsModel recommendedArtistsPo = new TopArtistsModel();
+  recommendedArtistsPo.items = recommendedArtistsItems;
+
+  return await createRecommendedPlaylist(authToken, null, recommendedArtistsPo);
+}
