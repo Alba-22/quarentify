@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:html';
 import 'package:dio/dio.dart';
+import 'package:intl/intl.dart';
 import 'package:quarentify/models/artists.list.model.dart';
 import 'package:quarentify/models/recommendations.model.dart';
 import 'package:quarentify/models/top.artists.model.dart';
@@ -320,4 +321,8 @@ Future<String> createTailoredPlaylist(TopArtistsModel artistsPo, List<TopGenreMo
   recommendedArtistsPo.items = recommendedArtistsItems;
 
   return await createRecommendedPlaylist(authToken, null, recommendedArtistsPo);
+}
+
+String convertFollowers(int followers) {
+  return NumberFormat().format(followers).replaceAll(",", ".");
 }

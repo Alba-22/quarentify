@@ -4,7 +4,7 @@ class TopGenresCard extends StatelessWidget {
 
   final String name;
 
-  const TopGenresCard({Key key, this.name}) : super(key: key);
+  const TopGenresCard({Key key, @required this.name}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +21,10 @@ class TopGenresCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            name,
+            name.replaceAllMapped(
+              RegExp(r"(^|(?<=\s))[a-z]"), 
+              (match) => match.group(0).toUpperCase()
+            ),
             style: TextStyle(
               color: Theme.of(context).textSelectionColor,
               fontSize: 18

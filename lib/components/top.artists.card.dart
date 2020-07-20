@@ -54,7 +54,7 @@ class TopArtistsCard extends StatelessWidget {
                 ),
                 SizedBox(width: 5),
                 AutoSizeText(
-                  "${artist.followers.total}",
+                  "${convertFollowers(artist.followers.total)}",
                   maxLines: 1,
                   textAlign: TextAlign.center,
                   style: TextStyle(

@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool initialLoading = true;
   bool activeUser = true;
 
-  String tempToken = "BQAbap5qixsIID1uqpFhvq75son-RH0TScMfeD3JIyUBBF4yEwVXOYFsVVmN6QqiG7DRCtiWMriCgA-5GopC1EUTE151rJOAIqrxizXjJznNAZNCsTCpBq7KZm2oeWRG6WXPl1uZuEDczi9wRRF3JsE1RCeAoT6zG3jcRu2SWMhnU-scMhIJj2E0Itpdd4lGNchO";
+  String tempToken = "BQDNyTKog1rxQMBd6Pwy0cTHn6-jGnChT-7hLCCJNGMdoPAXsoD5u7gMHedckDSfK51-iGboebjvr9ZDTFvAHm8q6JdXQo-yEVyn3Ajtq_bgSeYsOG46m_2wXaFbe4CibhVrF6CN8lsUDPnnCWDJUeFfmSIxYAl6HfCFARhkd3z9izMYn8pa5s0VzJTtd3ABiJnC";
 
   TopTracksModel tracks;
   TopArtistsModel artists;
@@ -159,9 +159,16 @@ class _HomeScreenState extends State<HomeScreen> {
               InkWell(
                 onTap: () async {
                   setState(() { playlistLoading = true; });
-                  final playlistId = await createRecommendedPlaylist(widget.accessToken, tracks, artists);
-                  setState(() { playlistLoading = false; });
-                  urlLauncher("https://open.spotify.com/playlist/$playlistId");
+                  final tailoredId = await createTailoredPlaylist(artists, tracksGenres, widget.accessToken);
+                  if (tailoredId != null) {
+                    setState(() { playlistLoading = false; });
+                    urlLauncher("https://open.spotify.com/playlist/$tailoredId");
+                  }
+                  else {
+                    final playlistId = await createRecommendedPlaylist(widget.accessToken, tracks, artists);
+                    setState(() { playlistLoading = false; });
+                    urlLauncher("https://open.spotify.com/playlist/$playlistId");
+                  }
                 },
                 child: Container(
                   color: Theme.of(context).primaryColor,
