@@ -18,7 +18,7 @@ class CustomButton extends StatelessWidget {
       : 180,
       child: MaterialButton(
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15)
+          borderRadius: BorderRadius.circular(25)
         ),
         color: Color(0xFF1DB954),
         onPressed: onTap,

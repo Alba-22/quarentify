@@ -1,6 +1,8 @@
 
 import 'dart:html';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:quarentify/components/custom.button.dart';
 import 'package:quarentify/components/top.genres.widget.dart';
 import 'package:quarentify/components/top.tracks.widget.dart';
 import 'package:quarentify/functions.dart';
@@ -23,8 +25,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool playlistLoading = false;
   bool initialLoading = true;
+  bool activeUser = true;
 
-  String tempToken = "BQAkFBQQf-QyD-OnBDYag1W3JzN0mY8DdxWTgwjKg-XzM_u2cVY5tuEVorxd5A7DJBbLby9iQ9t-mnGuXlYm14Q2VQ2jsAsXeTPHUi252qPmowmsq6aYZQq5qlcq-c0CgIQxqArPOTEzUwhJWJtl88JF-ngLn1PxX0TNBC84tw955pLjiJ2b7T0fc03321YZzD-W";
+  String tempToken = "BQAbap5qixsIID1uqpFhvq75son-RH0TScMfeD3JIyUBBF4yEwVXOYFsVVmN6QqiG7DRCtiWMriCgA-5GopC1EUTE151rJOAIqrxizXjJznNAZNCsTCpBq7KZm2oeWRG6WXPl1uZuEDczi9wRRF3JsE1RCeAoT6zG3jcRu2SWMhnU-scMhIJj2E0Itpdd4lGNchO";
 
   TopTracksModel tracks;
   TopArtistsModel artists;
@@ -38,6 +41,13 @@ class _HomeScreenState extends State<HomeScreen> {
     // ! CHANGE TEMPTOKEN TO WIDGET.ACCESSTOKEN
     tracks = await getTopRead("tracks", widget.accessToken);
     artists = await getTopRead("artists", widget.accessToken);
+    if (artists.total < 10 || tracks.total < 10) {
+      setState(() {
+        activeUser = false;
+        initialLoading = false;
+      });
+      return;
+    }
     tracksGenres = await getTopGenresByTracks(tracks, widget.accessToken);
     artistsGenres = await getTopGenresByArtists(artists);
     topGenres = getAllTopGenres(tracksGenres, artistsGenres);
@@ -63,6 +73,53 @@ class _HomeScreenState extends State<HomeScreen> {
           child: CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation(Theme.of(context).primaryColor),
           ),
+        ),
+      );
+    }
+    if (activeUser == false) {
+      return Scaffold(
+        body: Container(
+          color: Theme.of(context).backgroundColor,
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          padding: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width * 0.2
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "QUARENTIFY",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).primaryColor,
+                  fontSize: 25
+                ),
+              ),
+              SizedBox(height: 20),
+              AutoSizeText(
+                "Sua conta não possui dados o suficiente para exibição das informações.",
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Theme.of(context).textSelectionColor,
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.symmetric(
+                  vertical: 15
+                ),
+                child: CustomButton(
+                  width: 200,
+                  text: "Tentar Novamente",
+                  onTap: () {
+                    window.location.href = window.location.origin;
+                  },
+                ),
+              )
+            ],
+          )
         ),
       );
     }
