@@ -27,8 +27,6 @@ class _HomeScreenState extends State<HomeScreen> {
   bool initialLoading = true;
   bool activeUser = true;
 
-  String tempToken = "BQCjRkVL8O6Mi__Z4-aOl2UfgzqMyPnOJoQBkVx72qLFDU4kcTjfAQX_IV0tdmvs2bVOTGOG6V5iATGecvnKyr0AzHJR7BFhP8PvjS5Zrcbd9kPquF_910XSfcEyVUYZIhbOHl0jJfo42JE4eL3hxAl-gs1zsR7r4c8xPYu2ORjidCNajs17zTXw_XCN7jRtNCva";
-
   TopTracksModel tracks;
   TopArtistsModel artists;
   List<TopGenreModel> artistsGenres = new List();
@@ -38,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
   ScrollController scrollController = new ScrollController();
 
   manageTopRead() async {
-    // ! CHANGE TEMPTOKEN TO WIDGET.ACCESSTOKEN
     tracks = await getTopRead("tracks", widget.accessToken);
     artists = await getTopRead("artists", widget.accessToken);
     if (artists.total < 10 || tracks.total < 10) {

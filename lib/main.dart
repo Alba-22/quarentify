@@ -6,11 +6,7 @@ import 'package:quarentify/home.screen.dart';
 import 'functions.dart';
 
 void main() {
-  print(window.location.href);
   String accessToken = getAuthToken();
-  print(accessToken);
-  // ! UNCOMMENT ABOVE LINES AND COMMENT BELOW
-  // String accessToken = "";
   runApp(MyApp(accessToken: accessToken));
 }
 
