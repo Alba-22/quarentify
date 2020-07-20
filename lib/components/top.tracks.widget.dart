@@ -21,7 +21,7 @@ class TopTracksWidget extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Text.rich(
               TextSpan(
-                text: "Top 10 Músicas",
+                text: "Top ${tracks.length} Músicas",
                 children: [
                   TextSpan(
                     text: "  (clique para ouvir a música)",

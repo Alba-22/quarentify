@@ -23,7 +23,7 @@ class TopArtistsWidget extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: Text.rich(
               TextSpan(
-                text: "Top 10 Artistas",
+                text: "Top ${artists.length} Artistas",
                 children: [
                   TextSpan(
                     text: "  (clique para ver o perfil)",

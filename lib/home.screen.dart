@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   manageTopRead() async {
     tracks = await getTopRead("tracks", widget.accessToken);
     artists = await getTopRead("artists", widget.accessToken);
-    if (artists.total < 10 || tracks.total < 10) {
+    if (artists.total == 0 || tracks.total == 0) {
       setState(() {
         activeUser = false;
         initialLoading = false;
@@ -159,10 +159,14 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TopTracksWidget(
-                tracks: tracks.items.sublist(0, 10),
+                tracks: tracks.total > 10
+                ? tracks.items.sublist(0, 10)
+                : tracks.items.sublist(0, tracks.total),
               ),
               TopArtistsWidget(
-                artists: artists.items.sublist(0, 10),
+                artists: artists.total > 10
+                ? artists.items.sublist(0, 10)
+                : artists.items.sublist(0, artists.total),
               ),
               TopGenresWidget(
                 genres: topGenres,

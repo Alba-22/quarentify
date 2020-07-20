@@ -9,7 +9,7 @@ class TopTracksModel {
 
   TopTracksModel(
       {this.items,
-      this.total,
+      this.total = 0,
       this.limit,
       this.offset,
       this.href,
