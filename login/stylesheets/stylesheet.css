@@ -1,10 +1,15 @@
+@font-face {
+  font-family: 'gotham medium';
+  src: URL('Gotham-Medium.ttf') format('truetype');
+}
+
 * {
   box-sizing: border-box; }
 
 body {
   padding: 0;
   margin: 0;
-  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "Gotham-Medium" sans-serif;
   font-size: 16px;
   line-height: 1.5;
   background-color: #282828;
@@ -57,7 +62,10 @@ a {
 .page-header {
   color: #fff;
   text-align: center;
-  background-color: #282828; }
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-image: url("../backgroud.png"); }
 
 @media screen and (min-width: 64em) {
   .page-header {
