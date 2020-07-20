@@ -27,7 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool initialLoading = true;
   bool activeUser = true;
 
-  String tempToken = "BQDNyTKog1rxQMBd6Pwy0cTHn6-jGnChT-7hLCCJNGMdoPAXsoD5u7gMHedckDSfK51-iGboebjvr9ZDTFvAHm8q6JdXQo-yEVyn3Ajtq_bgSeYsOG46m_2wXaFbe4CibhVrF6CN8lsUDPnnCWDJUeFfmSIxYAl6HfCFARhkd3z9izMYn8pa5s0VzJTtd3ABiJnC";
+  String tempToken = "BQCjRkVL8O6Mi__Z4-aOl2UfgzqMyPnOJoQBkVx72qLFDU4kcTjfAQX_IV0tdmvs2bVOTGOG6V5iATGecvnKyr0AzHJR7BFhP8PvjS5Zrcbd9kPquF_910XSfcEyVUYZIhbOHl0jJfo42JE4eL3hxAl-gs1zsR7r4c8xPYu2ORjidCNajs17zTXw_XCN7jRtNCva";
 
   TopTracksModel tracks;
   TopArtistsModel artists;
@@ -136,6 +136,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         elevation: 0,
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: Icon(
+              Icons.share,
+              color: Theme.of(context).primaryColor,
+            ),
+            onPressed: () {
+              String text = "Minha música mais escutada durante a quarentena foi ${tracks.items[0].artists[0].name} - ${tracks.items[0].name}.\nConfira a sua em https://quarentify.agst.dev";
+              String share = 'https://twitter.com/intent/tweet?ref_src=twsrc%5Etfw&text=' + Uri.encodeComponent(text) + '&tw_p=tweetbutton';
+              urlLauncher(share);
+            },
+            padding: EdgeInsets.only(right: 10),
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Container(
